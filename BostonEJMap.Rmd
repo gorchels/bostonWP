@@ -16,14 +16,38 @@ library(leaflet)
 library(tmap)
 library(janitor)
 library(RColorBrewer)
+library(stargazer)
 ```
 
 ```{r}
 census_block = st_read(dsn = ".", layer = "CENSUS2010BLOCKGROUPS_POLY") %>%
   st_transform(crs = 4326) 
+ej_count=st_read(dsn = ".", layer = "Join_Output") %>% 
+  st_transform(crs = 4326) 
+ej_block=as_data_frame(st_read(dsn = ".", layer = "censusej") %>% 
+  st_transform(crs = 4326))
+
+
+ej_all =full_join(ej_count, ej_block, by="GEOID10") %>% 
+  mutate(gi_intensity=Sum_Count/AREA_ACRES.x)
 ```
 
 ```{r}
-plot(census_block)
+plot(ej_count)
 ```
 
+```{r}
+ej_reg=lm(gi_intensity~PCT_NO_ENG.y+PCT_MIN.y+POP100_RE.y+MED_HH_INC.y+EJ_CRITERI.y, data = ej_all)
+summary(ej_reg)
+#ej_min=lm(gi_intensity~PCT_MIN.y, data = ej_all)
+#summary(ej_min)
+#ej_crit_reg=lm(gi_intensity~EJ_CRITERI.y, data=ej_all)
+#ummary(ej_crit_reg)
+ej_reg_count=lm(Sum_Count~PCT_NO_ENG.y+PCT_MIN.y+POP100_RE.y+MED_HH_INC.y+EJ_CRITERI.y, data = ej_all)
+summary(ej_reg_count)
+area_gi = lm(Sum_Count~AREA_ACRES.x, data = ej_all)
+summary(area_gi)
+```
+```{r, results='asis'}
+stargazer(ej_reg,  type = "html")
+```
