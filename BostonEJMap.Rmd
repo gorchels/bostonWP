@@ -1,0 +1,29 @@
+---
+title: "BostonEJ"
+author: "Madeline Gorchels"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(tmap)
+library(janitor)
+library(RColorBrewer)
+```
+
+```{r}
+census_block = st_read(dsn = ".", layer = "CENSUS2010BLOCKGROUPS_POLY") %>%
+  st_transform(crs = 4326) 
+```
+
+```{r}
+plot(census_block)
+```
+
